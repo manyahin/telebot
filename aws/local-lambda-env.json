@@ -1,0 +1,10 @@
+{
+  "BotShopFunction": {
+    "RedisClusterHost": "redis",
+    "RedisClusterPort": 6379 
+  },
+  "BotWizardFunction": {
+    "RedisClusterHost": "redis",
+    "RedisClusterPort": 6379 
+  }
+}

@@ -1,0 +1,28 @@
+version: '2.0'
+services:
+  
+  nginx:
+    restart: always
+    ports:
+      - "127.0.0.1:8080:80"
+
+  bot-wizard:
+    restart: always
+    environment:
+      - botToken=
+      - botShopWebHookUrl=https://telebot.manyahin.com/shop
+
+  bot-shop:
+    restart: always
+
+  redis:
+    restart: always
+
+  mongo:
+    restart: always
+    ports:
+      - "127.0.0.1:27030:27017"
+    
+  support:
+    restart: always
+    

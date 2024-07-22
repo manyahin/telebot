@@ -1,0 +1,20 @@
+version: '2.0'
+services:
+
+  nginx:
+    # restart: always, no restart to see possible reason of corruptions?
+    ports:
+      - "127.0.0.1:8081:80"
+
+  bot-wizard:
+    environment:
+      - botToken=
+      - botShopWebHookUrl=https://telebot.ql2cz2e.manyahin.com/shop
+
+  mongo:
+    ports:
+      - "127.0.0.1:27031:27017"
+
+  support:
+    entrypoint: ["echo", "Service disabled for Stage"]
+    restart: "no"

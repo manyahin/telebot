@@ -1,0 +1,53 @@
+
+unknownError: Unknown error, please ask the support @TelebotSupportBot
+languageTranslated: Language changed to English
+demoLink: "https://t.me/VM1OsCYRj4VIqxCiBOT"
+
+keyboard:
+  back: ⬅️ Back to main menu
+  createShop: ➕ Create shop
+  help: ℹ️ Help
+  checkDemo: 🍕 Check the Demo
+  detailedInstructions: Detailed instructions
+  language: Language
+
+helpSection: |
+  <b>Telebot Help</b>
+
+  <b>FAQ</b>: <a href="https://telegra.ph/FAQ-08-13-5">https://telegra.ph/FAQ-08-13-5</a>
+
+  <b>Support</b>: @TelebotSupportBot
+
+  <b>WebSite</b>: <a href="https://telebot.manyahin.com">https://telebot.manyahin.com</a>
+
+newBotScene:
+  whatIsShopName: What is the shop name?
+  nameMaxLength: Maximum lenght of the name ${maxLength} characters
+  specifyToken: |
+    Specify a token to access your bot.
+    To create bot and get token use @BotFather
+  tokenIncorrect: |
+    Error!
+    Token is incorrect, use @BotFather to create a new one.
+  tokenInUse: Error! This token already in use.
+  shopCreated: Congratulation! The shop "${shopName}" is created!
+  openAndPlay: Now open it @${botUsername} and play with it!
+  instructionUrl: https://telegra.ph/How-to-create-bot-07-29
+  botsLimit: |
+    Free account allow to register only one bot
+    The paid account will be introduced soon 👁
+
+start:
+  welcome: Welcome to Telebot! 👋
+  header: Create simple Telegam Shops and manage it easy 🤹
+  description: |
+    With shop created via <b>Telebot</b> you can:
+
+    - Create your own catalog and share it with everybody
+    - Manage items
+    - Edit pages
+    - Receive orders (you will get message from your shop)
+    - Notification (soon!)
+    
+    And everything via Telegram interface! ⚡️
+  selectSection: Select the section to continue... 👇

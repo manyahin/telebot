@@ -1,0 +1,309 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Telebot service for creating simple Shops
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 10
+    MemorySize: 128
+    Handler: lambda.handler
+    Runtime: nodejs12.x
+
+Parameters:
+  EnvironmentName:
+    Description: An environment name that is prefixed to resource names
+    Type: String
+    Default: Telebot
+
+  VpcCIDR:
+    Description: Please enter the IP range (CIDR notation) for this VPC
+    Type: String
+    Default: 10.192.0.0/16
+
+  PublicSubnet1CIDR:
+    Description: Please enter the IP range (CIDR notation) for the public subnet in the first Availability Zone
+    Type: String
+    Default: 10.192.10.0/24
+
+  PrivateSubnet1CIDR:
+    Description: Please enter the IP range (CIDR notation) for the private subnet in the first Availability Zone
+    Type: String
+    Default: 10.192.20.0/24
+
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCIDR
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: !Ref EnvironmentName
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Ref EnvironmentName
+
+  InternetGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref VPC
+
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [ 0, !GetAZs '' ]
+      CidrBlock: !Ref PublicSubnet1CIDR
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName} Public Subnet
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName} Public Routes
+
+  DefaultPublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: InternetGatewayAttachment
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  PublicSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet1
+
+  NatGateway1EIP:
+    Type: AWS::EC2::EIP
+    DependsOn: InternetGatewayAttachment
+    Properties:
+      Domain: vpc
+
+  NatGateway1:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt NatGateway1EIP.AllocationId
+      SubnetId: !Ref PublicSubnet1
+
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [ 0, !GetAZs  '' ]
+      CidrBlock: !Ref PrivateSubnet1CIDR
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName} Private Subnet
+
+  PrivateSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable1
+      SubnetId: !Ref PrivateSubnet1
+
+  PrivateRouteTable1:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName} Private Routes
+
+  DefaultPrivateRoute1:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable1
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NatGateway1
+
+  LambdaSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: !Ref VPC
+      GroupDescription: Enable Web access 
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+
+  RedisClusterSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: !Ref VPC
+      GroupDescription: Enable Redis access 
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 6379
+          ToPort: 6379
+          CidrIp: 0.0.0.0/0
+
+  CachePrivateSubnetGroup:
+    Type: AWS::ElastiCache::SubnetGroup
+    Properties:
+        Description: Private subnet group for RedisCluster
+        SubnetIds: 
+          - !Ref PrivateSubnet1
+
+  RedisCluster:
+    Type: AWS::ElastiCache::CacheCluster
+    Properties:
+      CacheNodeType: cache.t2.micro
+      CacheSubnetGroupName:  !Ref CachePrivateSubnetGroup
+      Engine: redis
+      NumCacheNodes: 1
+      VpcSecurityGroupIds: 
+        - !GetAtt RedisClusterSecurityGroup.GroupId
+
+  DynamoDBEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Effect: Allow
+          Principal: "*"
+          Action:
+            - "dynamodb:*"
+          Resource:
+            - "*"
+      RouteTableIds:
+        - !Ref PrivateRouteTable1
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.dynamodb
+      VpcId: !Ref VPC
+
+  BotListTable:
+    Type: AWS::DynamoDB::Table
+    Properties: 
+      TableName: "BOT_LIST"
+      AttributeDefinitions: 
+        - AttributeName: "BOT_TOKEN"
+          AttributeType: "S"
+        - AttributeName: "UNIQUE_ID"
+          AttributeType: "S"
+      KeySchema: 
+        - AttributeName: "BOT_TOKEN"
+          KeyType: "HASH"
+      ProvisionedThroughput: 
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      GlobalSecondaryIndexes:
+        - IndexName: "UNIQUE_ID_INDEX"
+          KeySchema: 
+            - AttributeName: "UNIQUE_ID"
+              KeyType: "HASH"
+          Projection:
+            ProjectionType: ALL
+          ProvisionedThroughput:
+            ReadCapacityUnits: 1
+            WriteCapacityUnits: 1
+        # BOT_OWNER_ID
+
+  BotWizardFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: BotWizard
+      CodeUri: functions/bot-wizard/
+      Description: BotWizard that create other bots
+      Policies:
+        - AWSLambdaVPCAccessExecutionRole
+        - DynamoDBWritePolicy:
+            TableName:
+              Ref: BotListTable
+      VpcConfig:
+        SecurityGroupIds: 
+          - !Ref LambdaSecurityGroup
+        SubnetIds: 
+          - !Ref PrivateSubnet1
+      Environment:
+        Variables:
+          RedisClusterHost: !GetAtt RedisCluster.RedisEndpoint.Address
+          RedisClusterPort: !GetAtt RedisCluster.RedisEndpoint.Port
+      Events:
+        BotWizard:
+          # AWS SAM does not support HTTPApi via `sam local start-api` 
+          Type: Api
+          Properties:
+            Path: /bot-wizard
+            Method: POST
+
+  BotShopFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      FunctionName: BotShop
+      CodeUri: functions/bot-shop/
+      Description: BotShop that serve shop bots
+      Policies:
+        - AWSLambdaVPCAccessExecutionRole
+        - DynamoDBReadPolicy:
+            TableName:
+              Ref: BotListTable
+      Environment:
+        Variables:
+          RedisClusterHost: !GetAtt RedisCluster.RedisEndpoint.Address
+          RedisClusterPort: !GetAtt RedisCluster.RedisEndpoint.Port
+      VpcConfig:
+        SecurityGroupIds: 
+          - !Ref LambdaSecurityGroup
+        SubnetIds: 
+          - !Ref PrivateSubnet1
+      Events:
+        BotShop:
+          # AWS SAM does not support HTTPApi via `sam local start-api` 
+          Type: Api
+          Properties:
+            Path: /bot-shop
+            Method: POST
+
+  # Simple function allow to select all keys from Redis to see that is working            
+  # GetAllRedisKeys:
+  #   Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+  #   Properties:
+  #     FunctionName: GetAllRedisKeys
+  #     CodeUri: functions/get-all-redis-keys
+  #     Description: Get All Redis Keys from RedisCluster
+  #     Policies:
+  #       - AWSLambdaVPCAccessExecutionRole
+  #     VpcConfig:
+  #       SecurityGroupIds: 
+  #         - !Ref LambdaSecurityGroup
+  #       SubnetIds: 
+  #         - !Ref PrivateSubnet1
+  #     Environment:
+  #       Variables:
+  #         RedisClusterHost: !GetAtt RedisCluster.RedisEndpoint.Address
+  #         RedisClusterPort: !GetAtt RedisCluster.RedisEndpoint.Port
+
+Outputs:
+  
+  BotWizardApi:
+    Description: "API Gateway endpoint URL for BotWizard function"
+    # AWS SAM does not support HTTPApi via `sam local start-api`
+    # Value: !Sub "https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com/bot-wizard"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/bot-wizard"
+
+  BotShopApi:
+    Description: "API Gateway endpoint URL for BotShop function"
+    # AWS SAM does not support HTTPApi via `sam local start-api`
+    # Value: !Sub "https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com/bot-wizard"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/bot-shop"

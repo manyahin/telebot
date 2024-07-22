@@ -1,0 +1,42 @@
+
+disableKinds = ["taxonomy", "taxonomyTerm", "sitemap", "RSS"]
+disableHugoGeneratorInject = true
+
+languageCode = "en-us"
+
+DefaultContentLanguage = "en"
+defaultContentLanguageInSubdir = true
+
+[languages]
+  [languages.ru]
+    languageCode = "ru"
+    baseURL = "https://telebot.manyahin.ru"
+    author = "Илья Маняхин"
+    title = "Телебот - конструктор Телеграм магазинов"
+    keywords = "телеграм, магазин, телебот, конструктор, telegram, telebot, shop, constructor"
+    description = "Создавайте простые магазины и управляйте ими легко 🤹"
+    weight = 1
+
+    pageNotFound = "Страница не найдена"
+    pleaseReturnTo = "Пожалуйста, вернитесь на"
+    toName = "главную"
+
+    googleAnalytics = "UA-16630944-11"
+
+
+  [languages.en]
+    languageCode = "en"
+    baseURL = "https://telebot.manyahin.com"
+    author = "Ilya Manyahin"
+    title = "Telebot - constructor of simple Telegram shops"
+    keywords = "telegram, telebot, shop, constructor"
+    description = "Create simple shops and manage it easy 🤹"
+    weight = 2
+
+    pageNotFound = "Page not found"
+    pleaseReturnTo = "Please return to"
+    toName = "index page"
+
+    googleAnalytics = "UA-16630944-12"
+
+    

@@ -1,0 +1,103 @@
+
+unknownError: Unknown error, please ask the support @TelebotSupportBot
+languageTranslated: Language changed to English
+welcome: Welcome to "${shopName}"! 👋
+botMadeBy: Bot made by *Telebot* @TelebotWizardBot 💜
+backString: ⬅️ Back to main menu
+
+keyboard:
+  back: ⬅️ Back to main menu
+  createShop: ➕ Create shop
+  help: ℹ️ Help
+  checkDemo: 🍕 Check the Demo
+  detailedInstructions: Detailed instructions
+  language: Language
+  cancelOrder: ❌ Cancel order
+  approveOrder: 👍 Approve order
+  backToAdminPanel: « Back to admin panel
+  backToItemsPanel: « Back to items panel
+  backToPagesPanel: « Back to pages panel
+  yes: "Yes"
+  no: "No"
+  changeName: Change name
+  manageItems: Manage items
+  managePages: Manage pages
+  listItems: List items
+  addItem: Add item
+  deleteItem: Delete item
+  editItem: Edit item
+  editAbout: Edit about
+  editDescription: Edit description
+
+menu:
+  catalog: 📄 Catalog
+  order: 🛒 Order
+  about: 👩‍👩‍👦‍👦 About
+  admin: 🔒 Admin
+
+base:
+  catalogIsEmpty: Catalog is empty
+  itemDescription: |
+    Description: ${description}
+    Price: ${price}
+  nothingToOrder: Nothing to order
+
+newOrder:
+  whichItem: Which item you choose?
+  orderCanceled: Your order is canceled
+  yourOrder: "⭐️ Your order: ${itemName}"
+  newOrder: |
+    Got a new order!
+    From username: @${username}
+    Item: ${itemName}
+  orderReceived: Your order received! Soon we will contact you
+
+admin:
+  welcome: Welcome to admin panel!
+  youSelectedShop: |
+    You selected "${shopName}" - @${botUsername}.
+    What do you want to do with the shop?
+  whatToDo: What to do?
+  changeName:
+    newShopName: Enter a new name for the shop
+    maxLength: Maximum lenght of the name 128 characters
+    success: Success! Shop name updated
+  manageItems:
+    welcome: |
+      📦 Items managment panel
+      You have *${itemsCount}* items \\(maximum *${freeItemsCount}* items for free account\\)
+  managePages:
+    welcome: 📁 Pages managment panel
+  listItems:
+    noItems: You don't have any items yet
+  addItem:
+    limit: You reach the maximum limit of items - ${freeItems}
+    itemName: "Enter a new item name:"
+    maxLengthName: Maximum lenght of the item name is ${maxTextLength} characters
+    maxLengthDescription: Maximum lenght of the item description is ${maxTextLength} characters
+    enterDescription: Enter a description
+    enterPrice: Enter a price
+    deployPicture: Deploy a picture
+    sendOnlyPhoto: Please send photo, not file or not URL link
+    itemAdded: Item added!
+  deleteItem:
+    idToDelete: "Enter ID of item to delete:\n"
+    idInvalid: Item ID is invalid, it must be number from 1 to N
+    idNotExists: Item with ID ${itemId} not exists
+    areYouSure: Are you sure you want to delete *${itemName}*?
+    canceled: Canceled
+    cannotDeleteItem: Cannot delete item
+    itemDeleted: Item deleted
+  editAbout:
+    newText: "Enter new text for About page:"
+    maxLength: Maximum lenght of the About text is ${maxTextLength} characters
+    cannotUpdate: Cannot update about text
+    textUpdated: About text updated
+  editDescription:
+    newText: "Enter new text for Description page:"
+    maxLength: Maximum lenght of the Description text is ${maxTextLength} characters
+    cannotUpdate: Cannot update description text
+    textUpdated: Description text updated
+
+
+

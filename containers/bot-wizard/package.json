@@ -1,0 +1,27 @@
+{
+  "name": "bot-wizard",
+  "version": "1.0.0",
+  "description": "Telebot, Bot Wizard",
+  "main": "express.js",
+  "author": "Ilya Manyahin <i.manyahin@gmail.com>",
+  "dependencies": {
+    "aws-sdk": "^2.714.2",
+    "body-parse": "^0.1.0",
+    "dedent-js": "^1.0.1",
+    "express": "^4.17.1",
+    "lodash": "^4.17.19",
+    "mongodb": "^3.6.0",
+    "telegraf": "^3.38.0",
+    "telegraf-i18n": "^6.6.0",
+    "telegraf-session-redis": "^5.1.0",
+    "uuid": "^8.3.0"
+  },
+  "scripts": {
+    "start": "node express.js",
+    "test": "mocha tests/unit/"
+  },
+  "private": true,
+  "devDependencies": {
+    "colors": "^1.4.0"
+  }
+}

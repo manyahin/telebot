@@ -1,0 +1,25 @@
+{
+  "name": "telebot",
+  "version": "0.1.0",
+  "description": "The whole Telebot infrastructure and logic",
+  "scripts": {
+    "prod:start": "docker-compose -f docker-compose.yml -f dc.production.yml up -d",
+    "stage:start": "docker-compose -f docker-compose.yml -f dc.stage.yml up -d",
+    "dev:infra": "docker-compose -f docker-compose.yml -f dc.development.yml up -d redis mongo",
+    "dev:wizard": "cross-env DEBUG=telegraf:* nodemon containers/bot-wizard/local.js",
+    "dev:shop": "cross-env DEBUG=telegraf:* nodemon containers/bot-shop/local.js"
+  },
+  "devDependencies": {
+    "nodemon": "*",
+    "cross-env": "*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/manyahin/telebot.git"
+  },
+  "keywords": [
+    "Telegram Bot"
+  ],
+  "author": "Ilya Manyahin <i.manyahin@gmail.com>",
+  "private": "true"
+}

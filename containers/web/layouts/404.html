@@ -1,0 +1,11 @@
+{{ define "main" }}
+
+<div class="container main">
+  <h1>404</h1>
+
+  <h2>{{ .Site.Params.pageNotFound }}</h2>
+
+  <p>{{ .Site.Params.pleaseReturnTo }} <a href="/">{{ .Site.Params.toName }}</a></p>
+</div>
+
+{{ end }}

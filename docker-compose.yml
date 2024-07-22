@@ -1,0 +1,73 @@
+version: '2.0'
+services:
+
+  nginx:
+    image: nginx:1.18
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
+    volumes:
+      - ./containers/nginx:/etc/nginx/conf.d
+      - ./containers/web:/usr/share/nginx/html
+    links:
+      - bot-wizard
+      - bot-shop
+
+  bot-wizard:
+    build: containers/bot-wizard/
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
+    environment:
+      - RedisClusterHost=redis
+      - RedisClusterPort=6379
+    links:
+      - redis
+      - mongo
+
+  bot-shop:
+    build: containers/bot-shop/
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
+    environment:
+      - RedisClusterHost=redis
+      - RedisClusterPort=6379
+    links:
+      - redis
+      - mongo
+
+  redis:
+    image: redis:6
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
+
+  mongo:
+    image: mongo:4
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
+    volumes:
+      - 'mongo:/data/db'
+
+  support:
+    build: containers/support/
+    logging:
+      driver: "json-file"
+      options:
+          max-file: "5"
+          max-size: "10m"
+
+volumes:
+  mongo:
